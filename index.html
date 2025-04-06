@@ -346,8 +346,9 @@
             chatMessages.scrollTop = chatMessages.scrollHeight;
 
             // Add loading indicator
+            const loadingId = 'loading-' + Date.now();
             chatMessages.innerHTML += `
-                <div class="text-left mb-2">
+                <div id="${loadingId}" class="text-left mb-2">
                     <div class="inline-block bg-gray-600 rounded-lg px-3 py-1">
                         <i class="fas fa-spinner fa-spin"></i> Thinking...
                     </div>
@@ -356,23 +357,14 @@
             chatMessages.scrollTop = chatMessages.scrollHeight;
 
             try {
-                // Call our local chatbot API
-                // Add Puter AI script if not already loaded
+                // Load Puter AI script if needed
                 if (!window.puter) {
                     const script = document.createElement('script');
                     script.src = 'https://js.puter.com/v2/';
                     document.head.appendChild(script);
+                    await new Promise(resolve => script.onload = resolve);
                 }
 
-                let fullResponse = '';
-                const chat_resp = await puter.ai.chat(message, {
-                    model: 'claude-3-5-sonnet', 
-                    stream: true 
-                });
-                
-                // Remove loading indicator
-                document.getElementById(loadingId).remove();
-                
                 // Create response container
                 const responseDiv = document.createElement('div');
                 responseDiv.className = 'text-left mb-2';
@@ -382,10 +374,19 @@
                         <span id="ai-streaming-response"></span>
                     </div>
                 `;
+                
+                // Remove loading and add response container
+                document.getElementById(loadingId).remove();
                 chatMessages.appendChild(responseDiv);
                 const responseElement = document.getElementById('ai-streaming-response');
-                
-                // Stream the response
+
+                // Stream AI response
+                const chat_resp = await puter.ai.chat(message, {
+                    model: 'claude-3-5-sonnet',
+                    stream: true
+                });
+
+                let fullResponse = '';
                 for await (const part of chat_resp) {
                     if (part?.text) {
                         fullResponse += part.text;
@@ -393,16 +394,6 @@
                         chatMessages.scrollTop = chatMessages.scrollHeight;
                     }
                 }
-
-                // Remove loading indicator and add AI response
-                chatMessages.lastChild.remove();
-                chatMessages.innerHTML += `
-                    <div class="text-left mb-2">
-                        <div class="inline-block bg-gray-700 rounded-lg px-3 py-1">
-                            ${aiResponse}
-                        </div>
-                    </div>
-                `;
             } catch (error) {
                 console.error('AI Error:', error);
                 chatMessages.lastChild.remove();
