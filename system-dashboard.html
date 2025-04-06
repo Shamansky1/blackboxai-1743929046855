@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>System Diagnostics | AI PC Optimizer</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        body {
+            background-color: #1a202c;
+        }
+        .metric-card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        canvas {
+            max-height: 300px;
+        }
+    </style>
+</head>
+<body class="min-h-screen text-white">
+    <header class="bg-gray-900 py-4 px-6">
+        <div class="container mx-auto flex justify-between items-center">
+            <div class="flex items-center space-x-2">
+                <i class="fas fa-robot text-2xl text-blue-400"></i>
+                <h1 class="text-2xl font-bold">AI PC Optimizer</h1>
+            </div>
+            <nav>
+                <ul class="flex space-x-6">
+                    <li><a href="index.html" class="hover:text-blue-400"><i class="fas fa-home mr-1"></i> Dashboard</a></li>
+                    <li><a href="system-dashboard.html" class="text-blue-400"><i class="fas fa-chart-line mr-1"></i> System</a></li>
+                    <li><a href="recommendations.html" class="hover:text-blue-400"><i class="fas fa-lightbulb mr-1"></i> Recommendations</a></li>
+                    <li><a href="settings.html" class="hover:text-blue-400"><i class="fas fa-cog mr-1"></i> Settings</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container mx-auto py-8 px-4">
+        <section class="mb-8">
+            <h2 class="text-3xl font-bold mb-6">System Diagnostics</h2>
+            
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <!-- CPU Section -->
+                <div class="metric-card rounded-lg p-6">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="text-xl font-semibold flex items-center">
+                            <i class="fas fa-microchip text-blue-400 mr-2"></i> CPU Performance
+                        </h3>
+                        <span class="text-lg font-bold" id="cpu-percent">--%</span>
+                    </div>
+                    <canvas id="cpuChart"></canvas>
+                    <div class="mt-4 grid grid-cols-2 gap-4">
+                        <div>
+                            <p class="text-gray-400">Cores</p>
+                            <p class="text-xl font-bold" id="cpu-cores">--</p>
+                        </div>
+                        <div>
+                            <p class="text-gray-400">Speed</p>
+                            <p class="text-xl font-bold" id="cpu-speed">-- GHz</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- RAM Section -->
+                <div class="metric-card rounded-lg p-6">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="text-xl font-semibold flex items-center">
+                            <i class="fas fa-memory text-green-400 mr-2"></i> Memory Usage
+                        </h3>
+                        <span class="text-lg font-bold" id="ram-percent">--%</span>
+                    </div>
+                    <canvas id="ramChart"></canvas>
+                    <div class="mt-4 grid grid-cols-2 gap-4">
+                        <div>
+                            <p class="text-gray-400">Total</p>
+                            <p class="text-xl font-bold" id="ram-total">-- GB</p>
+                        </div>
+                        <div>
+                            <p class="text-gray-400">Available</p>
+                            <p class="text-xl font-bold" id="ram-available">-- GB</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Storage Section -->
+                <div class="metric-card rounded-lg p-6">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="text-xl font-semibold flex items-center">
+                            <i class="fas fa-hdd text-yellow-400 mr-2"></i> Storage
+                        </h3>
+                        <span class="text-lg font-bold" id="storage-percent">--%</span>
+                    </div>
+                    <canvas id="storageChart"></canvas>
+                    <div class="mt-4 grid grid-cols-2 gap-4">
+                        <div>
+                            <p class="text-gray-400">Total</p>
+                            <p class="text-xl font-bold" id="storage-total">-- GB</p>
+                        </div>
+                        <div>
+                            <p class="text-gray-400">Free</p>
+                            <p class="text-xl font-bold" id="storage-free">-- GB</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Temperature Section -->
+                <div class="metric-card rounded-lg p-6">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="text-xl font-semibold flex items-center">
+                            <i class="fas fa-temperature-high text-red-400 mr-2"></i> Temperatures
+                        </h3>
+                        <span class="text-lg font-bold" id="cpu-temp">--°C</span>
+                    </div>
+                    <canvas id="tempChart"></canvas>
+                    <div class="mt-4 grid grid-cols-2 gap-4">
+                        <div>
+                            <p class="text-gray-400">CPU</p>
+                            <p class="text-xl font-bold" id="cpu-temp-value">--°C</p>
+                        </div>
+                        <div>
+                            <p class="text-gray-400">GPU</p>
+                            <p class="text-xl font-bold" id="gpu-temp">--°C</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="text-center mt-8 space-x-4">
+            <button class="optimize-btn inline-block bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg transition duration-300" data-action="boostCPU">
+                <i class="fas fa-bolt mr-2"></i> Boost CPU
+            </button>
+            <button class="optimize-btn inline-block bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-6 rounded-lg transition duration-300" data-action="freeRAM">
+                <i class="fas fa-memory mr-2"></i> Free Up RAM
+            </button>
+            <button class="optimize-btn inline-block bg-yellow-600 hover:bg-yellow-700 text-white font-bold py-3 px-6 rounded-lg transition duration-300" data-action="optimizeStorage">
+                <i class="fas fa-hdd mr-2"></i> Optimize Storage
+            </button>
+            <a href="recommendations.html" class="inline-block bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 px-6 rounded-lg transition duration-300">
+                <i class="fas fa-lightbulb mr-2"></i> Generate AI Recommendations
+            </a>
+        </section>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="system-data.js"></script>
+    <script>
+        // Optimization button functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            // Retry logic for systemData availability
+            const MAX_RETRIES = 5;
+            let retries = 0;
+            
+            function initButtons() {
+                if (typeof systemData === 'undefined') {
+                    if (retries++ < MAX_RETRIES) {
+                        setTimeout(initButtons, 500);
+                        return;
+                    }
+                    console.error('systemData not available');
+                    return;
+                }
+
+                document.querySelectorAll('.optimize-btn').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        const action = this.dataset.action;
+                        if (systemData[action] && typeof systemData[action] === 'function') {
+                            try {
+                                systemData[action]();
+                                showNotification(`Optimization applied: ${action.replace(/([A-Z])/g, ' $1').trim()}`, 'bg-green-500');
+                            } catch (error) {
+                                console.error('Optimization failed:', error);
+                                showNotification('Optimization failed', 'bg-red-500');
+                            }
+                        }
+                    });
+                });
+            }
+
+            function showNotification(message, bgClass) {
+                const notification = document.createElement('div');
+                notification.className = `fixed top-4 right-4 ${bgClass} text-white px-4 py-2 rounded-lg shadow-lg`;
+                notification.textContent = message;
+                document.body.appendChild(notification);
+                
+                setTimeout(() => {
+                    notification.remove();
+                }, 3000);
+            }
+
+            initButtons();
+        });
+        // Server connection monitoring
+        let serverRetries = 0;
+        function checkServerConnection() {
+            fetch('/')
+                .catch(err => {
+                    console.warn('Server connection issue:', err);
+                    if (serverRetries++ < 3) {
+                        setTimeout(() => location.reload(), 1000);
+                    }
+                });
+        }
+        setInterval(checkServerConnection, 5000);
+        // Error handling for charts
+        function handleChartError(chart, error) {
+            console.error('Chart error:', error);
+            chart.destroy();
+        }
+        // Initialize charts
+        function initCharts() {
+            // CPU Chart
+            const cpuCtx = document.getElementById('cpuChart').getContext('2d');
+            const cpuChart = new Chart(cpuCtx, {
+                type: 'line',
+                data: {
+                    labels: Array(10).fill('').map((_, i) => `${i+1}s`),
+                    datasets: [{
+                        label: 'CPU Usage',
+                        data: Array(10).fill(0),
+                        borderColor: '#3b82f6',
+                        backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                        tension: 0.4,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: { display: false }
+                    },
+                    scales: {
+                        y: {
+                            min: 0,
+                            max: 100
+                        }
+                    }
+                }
+            });
+
+            // RAM Chart
+            const ramCtx = document.getElementById('ramChart').getContext('2d');
+            const ramChart = new Chart(ramCtx, {
+                type: 'line',
+                data: {
+                    labels: Array(10).fill('').map((_, i) => `${i+1}s`),
+                    datasets: [{
+                        label: 'RAM Usage',
+                        data: Array(10).fill(0),
+                        borderColor: '#10b981',
+                        backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                        tension: 0.4,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: { display: false }
+                    },
+                    scales: {
+                        y: {
+                            min: 0,
+                            max: 100
+                        }
+                    }
+                }
+            });
+
+            // Storage Chart
+            const storageCtx = document.getElementById('storageChart').getContext('2d');
+            const storageChart = new Chart(storageCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Used', 'Free'],
+                    datasets: [{
+                        data: [0, 100],
+                        backgroundColor: ['#f59e0b', '#1f2937'],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    cutout: '70%',
+                    plugins: {
+                        legend: { position: 'bottom' }
+                    }
+                }
+            });
+
+            // Temperature Chart
+            const tempCtx = document.getElementById('tempChart').getContext('2d');
+            const tempChart = new Chart(tempCtx, {
+                type: 'line',
+                data: {
+                    labels: Array(10).fill('').map((_, i) => `${i+1}s`),
+                    datasets: [{
+                        label: 'CPU Temp',
+                        data: Array(10).fill(0),
+                        borderColor: '#ef4444',
+                        backgroundColor: 'rgba(239, 68, 68, 0.1)',
+                        tension: 0.4,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: { display: false }
+                    },
+                    scales: {
+                        y: {
+                            min: 30,
+                            max: 100
+                        }
+                    }
+                }
+            });
+
+            return { cpuChart, ramChart, storageChart, tempChart };
+        }
+
+        // Update system page data
+        function updateSystemPage(charts) {
+            // Get data from script.js
+            const cpuPercent = systemData.cpu.usage;
+            const ramPercent = systemData.ram.usage;
+            const storagePercent = systemData.storage.usage;
+            const cpuTemp = systemData.temperature.cpu;
+            const gpuTemp = systemData.temperature.gpu || cpuTemp - 5;
+
+            // Update text values
+            document.getElementById('cpu-percent').textContent = `${cpuPercent}%`;
+            document.getElementById('ram-percent').textContent = `${ramPercent}%`;
+            document.getElementById('storage-percent').textContent = `${storagePercent}%`;
+            document.getElementById('cpu-temp-value').textContent = `${cpuTemp}°C`;
+            document.getElementById('gpu-temp').textContent = `${gpuTemp}°C`;
+            document.getElementById('cpu-temp').textContent = `${cpuTemp}°C`;
+            document.getElementById('cpu-cores').textContent = systemData.cpu.cores;
+            document.getElementById('cpu-speed').textContent = `${systemData.cpu.speed} GHz`;
+            document.getElementById('ram-total').textContent = `${systemData.ram.total} GB`;
+            document.getElementById('ram-available').textContent = `${Math.round(systemData.ram.total * (100 - ramPercent) / 100)} GB`;
+            document.getElementById('storage-total').textContent = `${systemData.storage.total} GB`;
+            document.getElementById('storage-free').textContent = `${Math.round(systemData.storage.total * (100 - storagePercent) / 100)} GB`;
+
+            // Update charts
+            updateChartData(charts.cpuChart, cpuPercent);
+            updateChartData(charts.ramChart, ramPercent);
+            updateChartData(charts.tempChart, cpuTemp);
+            
+            // Update storage chart
+            charts.storageChart.data.datasets[0].data = [storagePercent, 100 - storagePercent];
+            charts.storageChart.update();
+        }
+
+        function updateChartData(chart, newValue) {
+            chart.data.datasets[0].data.shift();
+            chart.data.datasets[0].data.push(newValue);
+            chart.update();
+        }
+
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', () => {
+            const charts = initCharts();
+            updateSystemPage(charts);
+            
+            // Update every 2 seconds
+            setInterval(() => updateSystemPage(charts), 2000);
+        });
+    </script>
+
+    <!-- AI Chat Box -->
+        <div id="aiChatContainer" class="fixed bottom-6 right-6 w-96 bg-gray-800 rounded-t-lg shadow-xl transition-all duration-300 ease-in-out transform translate-y-0 max-h-[80vh] flex flex-col z-50" style="display: none;">
+
+        <!-- Chat Header -->
+        <div class="bg-gray-900 px-4 py-3 rounded-t-lg flex justify-between items-center">
+            <div class="flex items-center space-x-2">
+                <i class="fas fa-robot text-blue-400"></i>
+                <h3 class="font-bold">PC Optimization Assistant</h3>
+            </div>
+            <button id="closeChat" class="text-gray-400 hover:text-white">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+
+        <!-- Messages Container -->
+        <div id="chatMessages" class="flex-1 overflow-y-auto p-4 space-y-3">
+            <div class="flex justify-start">
+                <div class="bg-gray-700 rounded-lg p-3 max-w-[80%]">
+                    <p>Hello! I'm your PC Optimization Assistant. Ask me anything about improving your computer's performance.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Input Area -->
+        <div class="border-t border-gray-700 p-3 bg-gray-800">
+            <div class="flex space-x-2">
+                <input 
+                    id="chatInput" 
+                    type="text" 
+                    placeholder="Ask about PC optimizations..." 
+                    class="flex-1 bg-gray-700 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                >
+                <button id="sendMessage" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition">
+                    <i class="fas fa-paper-plane"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Chat Toggle Button -->
+    <button id="chatToggle" class="fixed bottom-6 right-6 bg-blue-600 hover:bg-blue-700 text-white p-4 rounded-full shadow-lg transition">
+        <i class="fas fa-robot text-xl"></i>
+    </button>
+
+    <script>
+        // Chat functionality
+        document.addEventListener('DOMContentLoaded', () => {
+            const chatContainer = document.getElementById('aiChatContainer');
+            const chatToggle = document.getElementById('chatToggle');
+            const closeChat = document.getElementById('closeChat');
+            const chatInput = document.getElementById('chatInput');
+            const sendButton = document.getElementById('sendMessage');
+            const messagesContainer = document.getElementById('chatMessages');
+
+            // Track chat state
+            let isChatOpen = false;
+
+            // Toggle chat visibility
+            function toggleChat() {
+                isChatOpen = !isChatOpen;
+                chatContainer.classList.toggle('hidden', !isChatOpen);
+                chatContainer.classList.toggle('flex', isChatOpen);
+            }
+
+            // Initialize chat state
+            chatContainer.classList.add('hidden');
+            
+            // Click handlers
+            chatToggle.addEventListener('click', (e) => {
+                e.stopPropagation();
+                toggleChat();
+            });
+
+            closeChat.addEventListener('click', (e) => {
+                e.stopPropagation();
+                toggleChat();
+            });
+
+            // Close chat when clicking outside
+            document.addEventListener('click', (e) => {
+                if (isChatOpen && !chatContainer.contains(e.target) && e.target !== chatToggle) {
+                    toggleChat();
+                }
+            });
+
+            // Send message function
+            function sendMessage() {
+                const message = chatInput.value.trim();
+                if (!message) return;
+
+                // Add user message
+                addMessage(message, 'user');
+                chatInput.value = '';
+
+                // Simulate AI response
+                setTimeout(() => {
+                    const response = getAIResponse(message);
+                    addMessage(response, 'ai');
+                }, 800);
+            }
+
+            // Add message to chat
+            function addMessage(text, sender) {
+                const messageDiv = document.createElement('div');
+                messageDiv.className = `flex ${sender === 'user' ? 'justify-end' : 'justify-start'}`;
+                
+                const bubbleDiv = document.createElement('div');
+                bubbleDiv.className = `rounded-lg p-3 max-w-[80%] ${sender === 'user' ? 'bg-blue-600' : 'bg-gray-700'}`;
+                bubbleDiv.textContent = text;
+                
+                messageDiv.appendChild(bubbleDiv);
+                messagesContainer.appendChild(messageDiv);
+                messagesContainer.scrollTop = messagesContainer.scrollHeight;
+            }
+
+            // AI response logic
+            function getAIResponse(userMessage) {
+                const lowerMessage = userMessage.toLowerCase();
+                
+                // Context-aware recommendations
+                if (systemData.cpu.usage > 80) {
+                    return "⚠️ High CPU usage detected! Click 'Boost CPU' to reduce load by 15% immediately.";
+                }
+                if (systemData.ram.usage > 85) {
+                    return "MemoryWarning: RAM over 85%! Use 'Free Up RAM' to clear 20% of used memory.";
+                }
+                if (systemData.storage.usage > 90) {
+                    return "Storage critical! Use 'Optimize Storage' to free up 10% space instantly.";
+                }
+                if (systemData.temperature.cpu > 75) {
+                    return "🔥 High CPU temperature! Cooling recommended. Try 'Boost CPU' to reduce load and heat.";
+                }
+
+                // Predefined responses
+                const responses = {
+                    'cpu': `Current CPU: ${systemData.cpu.usage}% usage. Try 'Boost CPU' or: 1) Update BIOS, 2) Set power plan to 'High performance', 3) Close background apps.`,
+                    'ram': `Current RAM: ${systemData.ram.usage}% usage. Try 'Free Up RAM' or: 1) Close unused apps, 2) Disable startup programs, 3) Add more RAM if needed.`,
+                    'storage': `Current Storage: ${systemData.storage.usage}% used. Try 'Optimize Storage' or: 1) Run Disk Cleanup, 2) Move large files, 3) Clear caches.`,
+                    'temperature': `Current CPU Temp: ${systemData.temperature.cpu}°C. For cooling: 1) Clean fans/vents, 2) Improve airflow, 3) Consider better cooling.`,
+                    'speed': "To improve speed: 1) Use optimization buttons above, 2) Disable visual effects, 3) Upgrade hardware if needed.",
+                    'default': `System Status: CPU ${systemData.cpu.usage}%, RAM ${systemData.ram.usage}%, Storage ${systemData.storage.usage}%. Try our optimization tools above!`
+                };
+
+                if (lowerMessage.includes('cpu')) return responses.cpu;
+                if (lowerMessage.includes('ram') || lowerMessage.includes('memory')) return responses.ram;
+                if (lowerMessage.includes('storage') || lowerMessage.includes('disk') || lowerMessage.includes('ssd') || lowerMessage.includes('hdd')) return responses.storage;
+                if (lowerMessage.includes('temp') || lowerMessage.includes('heat') || lowerMessage.includes('cool')) return responses.temperature;
+                if (lowerMessage.includes('slow') || lowerMessage.includes('speed') || lowerMessage.includes('fast')) return responses.speed;
+                
+                return responses.default;
+            }
+
+            // Event listeners
+            sendButton.addEventListener('click', sendMessage);
+            chatInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') sendMessage();
+            });
+        });
+    </script>
+</body>
+</html>
