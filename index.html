@@ -1,0 +1,592 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI PC Optimizer</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            overflow-x: hidden;
+        }
+        .video-background {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            z-index: -1;
+            opacity: 0.7;
+        }
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            right: 0;
+            min-width: 200px;
+            z-index: 1;
+        }
+        .dropdown:hover .dropdown-content {
+            display: block;
+        }
+        #chatContainer {
+            transition: all 0.3s ease;
+        }
+    </style>
+</head>
+<body class="min-h-screen text-white">
+    <!-- Background Video -->
+    <video autoplay muted loop class="video-background">
+        <source src="1743855746_1743855716_eed079d1-cf3c-4eba-b4d6-921278c5424f_no_sub_h264_watermarked.mp4" type="video/mp4">
+    </video>
+
+    <!-- Header -->
+    <header class="bg-gray-900 bg-opacity-80 py-4 px-6">
+        <div class="container mx-auto flex justify-between items-center">
+            <div class="flex items-center space-x-2">
+                <i class="fas fa-robot text-2xl text-blue-400"></i>
+                <h1 class="text-2xl font-bold">AI PC Optimizer</h1>
+            </div>
+            <div class="flex space-x-4">
+                <!-- Chat Toggle -->
+                <button id="chatToggle" class="flex items-center space-x-1 hover:text-blue-400">
+                    <i class="fas fa-comment"></i>
+                    <span>AI Assistant</span>
+                </button>
+                
+                <!-- Settings Panel -->
+                <div class="relative">
+                    <button id="settingsToggle" class="flex items-center space-x-1 hover:text-blue-400">
+                        <i class="fas fa-cog"></i>
+                        <span>Settings</span>
+                    </button>
+                    <div id="settingsPanel" class="hidden absolute right-0 mt-2 w-80 glass-panel rounded-lg p-4 shadow-xl z-50">
+                        <div class="space-y-4">
+                            <!-- System Settings -->
+                            <div>
+                                <h3 class="font-bold mb-2">System Settings</h3>
+                                <div class="space-y-4">
+                                    <div>
+                                        <label class="block font-medium mb-1">Theme</label>
+                                        <select class="w-full bg-gray-700 rounded px-2 py-1">
+                                            <option>Dark</option>
+                                            <option>Light</option>
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label class="block font-medium mb-1">Notifications</label>
+                                        <div class="space-y-2">
+                                            <label class="flex items-center">
+                                                <input type="checkbox" checked class="mr-2">
+                                                CPU Alerts
+                                            </label>
+                                            <label class="flex items-center">
+                                                <input type="checkbox" checked class="mr-2">
+                                                RAM Alerts
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="flex space-x-2">
+                                <button id="applySettings" class="flex-1 bg-blue-600 hover:bg-blue-700 py-2 rounded">
+                                    Apply
+                                </button>
+                                <button id="cancelSettings" class="flex-1 bg-gray-600 hover:bg-gray-700 py-2 rounded">
+                                    Cancel
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="container mx-auto py-8 px-4">
+        <!-- System Overview -->
+        <section class="mb-8 glass-panel rounded-lg p-6">
+            <h2 class="text-2xl font-bold mb-4">System Overview</h2>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <!-- CPU Card -->
+                <div class="p-4 rounded-lg bg-gray-800 bg-opacity-70">
+                    <div class="flex justify-between items-center mb-2">
+                        <div class="flex items-center">
+                            <i class="fas fa-microchip text-blue-400 mr-2"></i>
+                            <span>CPU</span>
+                        </div>
+                        <span class="font-bold" id="cpu-usage">--%</span>
+                    </div>
+                    <div class="w-full bg-gray-700 rounded-full h-2">
+                        <div class="bg-blue-500 h-2 rounded-full" id="cpu-bar" style="width: 0%"></div>
+                    </div>
+                </div>
+
+                <!-- RAM Card -->
+                <div class="p-4 rounded-lg bg-gray-8 00 bg-opacity-70">
+                    <div class="flex justify-between items-center mb-2">
+                        <div class="flex items-center">
+                            <i class="fas fa-memory text-green-400 mr-2"></i>
+                            <span>RAM</span>
+                        </div>
+                        <span class="font-bold" id="ram-usage">--%</span>
+                    </div>
+                    <div class="w-full bg-gray-700 rounded-full h-2">
+                        <div class="bg-green-500 h-2 rounded-full" id="ram-bar" style="width: 0%"></div>
+                    </div>
+                </div>
+
+                <!-- Storage Card -->
+                <div class="p-4 rounded-lg bg-gray-800 bg-opacity-70">
+                    <div class="flex justify-between items-center mb-2">
+                        <div class="flex items-center">
+                            <i class="fas fa-hdd text-yellow-400 mr-2"></i>
+                            <span>Storage</span>
+                        </div>
+                        <span class="font-bold" id="storage-usage">--%</span>
+                    </div>
+                    <div class="w-full bg-gray-700 rounded-full h-2">
+                        <div class="bg-yellow-500 h-2 rounded-full" id="storage-bar" style="width: 0%"></div>
+                    </div>
+                </div>
+
+                <!-- Temperature Card -->
+                <div class="p-4 rounded-lg bg-gray-800 bg-opacity-70">
+                    <div class="flex justify-between items-center mb-2">
+                        <div class="flex items-center">
+                            <i class="fas fa-temperature-high text-red-400 mr-2"></i>
+                            <span>Temp</span>
+                        </div>
+                        <span class="font-bold" id="temp-usage">--°C</span>
+                    </div>
+                    <div class="w-full bg-gray-700 rounded-full h-2">
+                        <div class="bg-red-500 h-2 rounded-full" id="temp-bar" style="width: 0%"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Detailed Metrics -->
+        <section class="mb-8 glass-panel rounded-lg p-6">
+            <h2 class="text-2xl font-bold mb-4">Performance Metrics</h2>
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <!-- CPU Chart -->
+                <div>
+                    <h3 class="text-lg font-semibold mb-2 flex items-center">
+                        <i class="fas fa-microchip text-blue-400 mr-2"></i> CPU Usage
+                    </h3>
+                    <canvas id="cpuChart" height="200"></canvas>
+                </div>
+                
+                <!-- RAM Chart -->
+                <div>
+                    <h3 class="text-lg font-semibold mb-2 flex items-center">
+                        <i class="fas fa-memory text-green-400 mr-2"></i> Memory Usage
+                    </h3>
+                    <canvas id="ramChart" height="200"></canvas>
+                </div>
+            </div>
+        </section>
+
+        <!-- Recommendations -->
+        <section class="glass-panel rounded-lg p-6">
+            <h2 class="text-2xl font-bold mb-4">Optimization Recommendations</h2>
+            <div class="space-y-4" id="recommendations">
+                <!-- Filled by JavaScript -->
+            </div>
+        </section>
+    </main>
+
+    <!-- Music Player -->
+    <div class="fixed bottom-4 left-4 bg-black bg-opacity-70 p-3 rounded-xl backdrop-blur-lg shadow-lg">
+    
+    <!-- AI Chatbox -->
+    <div id="chatContainer" class="fixed bottom-20 right-4 w-80 glass-panel rounded-lg shadow-xl z-50 hidden">
+        <div class="bg-gray-800 bg-opacity-80 px-4 py-2 flex justify-between items-center">
+            <h3 class="font-bold flex items-center">
+                <i class="fas fa-robot text-blue-400 mr-2"></i>
+                AI Optimization Assistant
+            </h3>
+            <button id="closeChat" class="text-gray-300 hover:text-white">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        
+        <div id="chatMessages" class="h-64 overflow-y-auto p-3 space-y-2 bg-gray-900 bg-opacity-50">
+            <div class="text-left">
+                <div class="inline-block bg-gray-700 rounded-lg px-3 py-1">
+                    Hello! I'm your AI assistant. How can I help optimize your system today?
+                </div>
+            </div>
+        </div>
+        
+        <div class="p-3 bg-gray-800 bg-opacity-80 flex">
+            <input 
+                id="chatInput" 
+                type="text" 
+                placeholder="Ask for optimization help..."
+                class="flex-1 bg-gray-700 rounded-l-lg px-3 py-2 text-white focus:outline-none"
+            >
+            <button 
+                id="sendChat" 
+                class="bg-blue-600 hover:bg-blue-700 px-3 py-2 rounded-r-lg"
+            >
+                <i class="fas fa-paper-plane"></i>
+            </button>
+        </div>
+    </div>
+        <div class="flex items-center space-x-4">
+            <button id="playBtn" class="w-8 h-8 flex items-center justify-center">
+                <i class="fas fa-play"></i>
+            </button>
+            <div class="flex items-center space-x-2">
+                <i class="fas fa-music"></i>
+                <span>Chill Focus Mix</span>
+            </div>
+            <div class="flex items-center space-x-2 ml-2">
+                <i id="volumeIcon" class="fas fa-volume-up"></i>
+                <input 
+                    id="volumeControl" 
+                    type="range" 
+                    min="0" 
+                    max="1" 
+                    step="0.1" 
+                    value="0.5"
+                    class="w-20 accent-blue-500"
+                >
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Initialize music player with volume control
+        const bgMusic = new Audio('Chill Music — Deep Focus & Inspiring Mix-yt.savetube.me.mp3');
+        bgMusic.loop = true;
+        
+        // Set initial volume
+        const savedVolume = localStorage.getItem('musicVolume');
+        if (savedVolume) {
+            bgMusic.volume = parseFloat(savedVolume);
+            document.getElementById('volumeControl').value = savedVolume;
+            updateVolumeIcon();
+        }
+
+        // Play/pause functionality
+        document.getElementById('playBtn').addEventListener('click', () => {
+            if (bgMusic.paused) {
+                bgMusic.play();
+                document.getElementById('playBtn').innerHTML = '<i class="fas fa-pause"></i>';
+            } else {
+                bgMusic.pause();
+                document.getElementById('playBtn').innerHTML = '<i class="fas fa-play"></i>';
+            }
+        });
+
+        // Volume control
+        document.getElementById('volumeControl').addEventListener('input', (e) => {
+            bgMusic.volume = e.target.value;
+            localStorage.setItem('musicVolume', e.target.value);
+            updateVolumeIcon();
+        });
+
+        // Update volume icon based on level
+        function updateVolumeIcon() {
+            const volume = document.getElementById('volumeControl').value;
+            const icon = document.getElementById('volumeIcon');
+            
+            if (volume == 0) {
+                icon.className = 'fas fa-volume-mute';
+            } else if (volume < 0.5) {
+                icon.className = 'fas fa-volume-down';
+            } else {
+                icon.className = 'fas fa-volume-up';
+            }
+        }
+
+        // Chat toggle functionality
+        const chatToggle = document.getElementById('chatToggle');
+        const chatContainer = document.getElementById('chatContainer');
+        const closeChat = document.getElementById('closeChat');
+        
+        chatToggle.addEventListener('click', () => {
+            chatContainer.classList.toggle('hidden');
+        });
+        
+        closeChat.addEventListener('click', () => {
+            chatContainer.classList.add('hidden');
+        });
+
+        // AI Chat functionality
+        const chatInput = document.getElementById('chatInput');
+        const chatMessages = document.getElementById('chatMessages');
+        const sendChat = document.getElementById('sendChat');
+
+        async function sendMessage() {
+            const message = chatInput.value.trim();
+            if (!message) return;
+
+            // Add user message
+            chatMessages.innerHTML += `
+                <div class="text-right mb-2">
+                    <div class="inline-block bg-blue-600 rounded-lg px-3 py-1">
+                        ${message}
+                    </div>
+                </div>
+            `;
+            
+            chatInput.value = '';
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+
+            // Add loading indicator
+            chatMessages.innerHTML += `
+                <div class="text-left mb-2">
+                    <div class="inline-block bg-gray-600 rounded-lg px-3 py-1">
+                        <i class="fas fa-spinner fa-spin"></i> Thinking...
+                    </div>
+                </div>
+            `;
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+
+            try {
+                // Call our local chatbot API
+                // Add Puter AI script if not already loaded
+                if (!window.puter) {
+                    const script = document.createElement('script');
+                    script.src = 'https://js.puter.com/v2/';
+                    document.head.appendChild(script);
+                }
+
+                let fullResponse = '';
+                const chat_resp = await puter.ai.chat(message, {
+                    model: 'claude-3-5-sonnet', 
+                    stream: true 
+                });
+                
+                // Remove loading indicator
+                document.getElementById(loadingId).remove();
+                
+                // Create response container
+                const responseDiv = document.createElement('div');
+                responseDiv.className = 'text-left mb-2';
+                responseDiv.innerHTML = `
+                    <div class="inline-block bg-gray-700 rounded-lg px-3 py-1">
+                        <i class="fas fa-robot text-blue-400 mr-1"></i>
+                        <span id="ai-streaming-response"></span>
+                    </div>
+                `;
+                chatMessages.appendChild(responseDiv);
+                const responseElement = document.getElementById('ai-streaming-response');
+                
+                // Stream the response
+                for await (const part of chat_resp) {
+                    if (part?.text) {
+                        fullResponse += part.text;
+                        responseElement.innerHTML = fullResponse.replaceAll('\n', '<br>');
+                        chatMessages.scrollTop = chatMessages.scrollHeight;
+                    }
+                }
+
+                // Remove loading indicator and add AI response
+                chatMessages.lastChild.remove();
+                chatMessages.innerHTML += `
+                    <div class="text-left mb-2">
+                        <div class="inline-block bg-gray-700 rounded-lg px-3 py-1">
+                            ${aiResponse}
+                        </div>
+                    </div>
+                `;
+            } catch (error) {
+                console.error('AI Error:', error);
+                chatMessages.lastChild.remove();
+                chatMessages.innerHTML += `
+                    <div class="text-left mb-2">
+                        <div class="inline-block bg-red-600 rounded-lg px-3 py-1">
+                            Error: Could not get AI response
+                        </div>
+                    </div>
+                `;
+            }
+
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        sendChat.addEventListener('click', sendMessage);
+        chatInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') sendMessage();
+        });
+
+        // Initialize music player using the full implementation from script.js
+        document.addEventListener('DOMContentLoaded', () => {
+            initMusicPlayer();
+            
+            // Initialize charts
+            initCharts();
+            
+            // Update metrics
+            updateMetrics();
+            setInterval(updateMetrics, 2000);
+            
+            // Generate recommendations
+            generateRecommendations();
+        });
+
+        // Update all metrics
+        function updateMetrics() {
+            // CPU
+            document.getElementById('cpu-usage').textContent = `${systemData.cpu.usage}%`;
+            document.getElementById('cpu-bar').style.width = `${systemData.cpu.usage}%`;
+            
+            // RAM
+            document.getElementById('ram-usage').textContent = `${systemData.ram.usage}%`;
+            document.getElementById('ram-bar').style.width = `${systemData.ram.usage}%`;
+            
+            // Storage
+            document.getElementById('storage-usage').textContent = `${systemData.storage.usage}%`;
+            document.getElementById('storage-bar').style.width = `${systemData.storage.usage}%`;
+            
+            // Temperature
+            document.getElementById('temp-usage').textContent = `${systemData.temperature.cpu}°C`;
+            document.getElementById('temp-bar').style.width = `${systemData.temperature.cpu}%`;
+        }
+
+        // Initialize charts
+        function initCharts() {
+            // CPU Chart
+            const cpuCtx = document.getElementById('cpuChart').getContext('2d');
+            const cpuChart = new Chart(cpuCtx, {
+                type: 'line',
+                data: {
+                    labels: Array(10).fill('').map((_, i) => `${i+1}s`),
+                    datasets: [{
+                        data: Array(10).fill(systemData.cpu.usage),
+                        borderColor: '#3b82f6',
+                        backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                        tension: 0.4,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: { legend: { display: false } },
+                    scales: { y: { min: 0, max: 100 } }
+                }
+            });
+
+            // RAM Chart
+            const ramCtx = document.getElementById('ramChart').getContext('2d');
+            const ramChart = new Chart(ramCtx, {
+                type: 'line',
+                data: {
+                    labels: Array(10).fill('').map((_, i) => `${i+1}s`),
+                    datasets: [{
+                        data: Array(10).fill(systemData.ram.usage),
+                        borderColor: '#10b981',
+                        backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                        tension: 0.4,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: { legend: { display: false } },
+                    scales: { y: { min: 0, max: 100 } }
+                }
+            });
+
+            // Update charts periodically
+            setInterval(() => {
+                updateChartData(cpuChart, systemData.cpu.usage);
+                updateChartData(ramChart, systemData.ram.usage);
+            }, 2000);
+        }
+
+        // Update chart data
+        function updateChartData(chart, newValue) {
+            chart.data.datasets[0].data.shift();
+            chart.data.datasets[0].data.push(newValue);
+            chart.update();
+        }
+
+        // Generate recommendations
+        function generateRecommendations() {
+            const container = document.getElementById('recommendations');
+            let html = '';
+
+            // CPU Recommendation
+            if (systemData.cpu.usage > 80) {
+                html += `
+                    <div class="flex items-start p-3 bg-red-900 bg-opacity-30 rounded-lg">
+                        <i class="fas fa-exclamation-triangle text-red-400 mt-1 mr-3"></i>
+                        <div>
+                            <h3 class="font-bold">High CPU Usage (${systemData.cpu.usage}%)</h3>
+                            <p class="text-sm">Close unnecessary applications or run CPU optimization</p>
+                        </div>
+                    </div>
+                `;
+            }
+
+            // RAM Recommendation
+            if (systemData.ram.usage > 85) {
+                html += `
+                    <div class="flex items-start p-3 bg-red-900 bg-opacity-30 rounded-lg">
+                        <i class="fas fa-exclamation-triangle text-red-400 mt-1 mr-3"></i>
+                        <div>
+                            <h3 class="font-bold">High RAM Usage (${systemData.ram.usage}%)</h3>
+                            <p class="text-sm">Close unused programs or add more memory</p>
+                        </div>
+                    </div>
+                `;
+            }
+
+            // Storage Recommendation
+            if (systemData.storage.usage > 90) {
+                html += `
+                    <div class="flex items-start p-3 bg-yellow-900 bg-opacity-30 rounded-lg">
+                        <i class="fas fa-exclamation-circle text-yellow-400 mt-1 mr-3"></i>
+                        <div>
+                            <h3 class="font-bold">Low Storage (${systemData.storage.usage}% used)</h3>
+                            <p class="text-sm">Delete unnecessary files or add more storage</p>
+                        </div>
+                    </div>
+                `;
+            }
+
+            // Temperature Recommendation
+            if (systemData.temperature.cpu > 80) {
+                html += `
+                    <div class="flex items-start p-3 bg-red-900 bg-opacity-30 rounded-lg">
+                        <i class="fas fa-exclamation-triangle text-red-400 mt-1 mr-3"></i>
+                        <div>
+                            <h3 class="font-bold">High Temperature (${systemData.temperature.cpu}°C)</h3>
+                            <p class="text-sm">Check cooling system and clean dust from vents</p>
+                        </div>
+                    </div>
+                `;
+            }
+
+            // If no critical issues
+            if (!html) {
+                html = `
+                    <div class="flex items-start p-3 bg-green-900 bg-opacity-30 rounded-lg">
+                        <i class="fas fa-check-circle text-green-400 mt-1 mr-3"></i>
+                        <div>
+                            <h3 class="font-bold">System Running Smoothly</h3>
+                            <p class="text-sm">No critical issues detected</p>
+                        </div>
+                    </div>
+                `;
+            }
+
+            container.innerHTML = html;
+        }
+    </script>
+</body>
+</html>
