@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI PC Optimizer</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        body {
+            background-image: url('https://images.pexels.com/photos/3561709/pexels-photo-3561709.jpeg');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+        }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+    </style>
+</head>
+<body class="min-h-screen text-white">
+    <header class="bg-gray-900 bg-opacity-80 py-4 px-6">
+        <div class="container mx-auto flex justify-between items-center">
+            <div class="flex items-center space-x-2">
+                <i class="fas fa-robot text-2xl text-blue-400"></i>
+                <h1 class="text-2xl font-bold">AI PC Optimizer</h1>
+            </div>
+            <nav>
+                <ul class="flex space-x-6">
+                    <li><a href="index.html" class="hover:text-blue-400"><i class="fas fa-home mr-1"></i> Dashboard</a></li>
+                    <li><a href="system-dashboard.html" class="hover:text-blue-400"><i class="fas fa-chart-line mr-1"></i> System</a></li>
+                    <li><a href="recommendations.html" class="hover:text-blue-400"><i class="fas fa-lightbulb mr-1"></i> Recommendations</a></li>
+                    <li><a href="settings.html" class="hover:text-blue-400"><i class="fas fa-cog mr-1"></i> Settings</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container mx-auto py-8 px-4">
+        <section class="mb-8">
+            <h2 class="text-3xl font-bold mb-6">System Overview</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <!-- CPU Card -->
+                <div class="glass-card rounded-lg p-6 shadow-lg">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <h3 class="text-xl font-semibold mb-2">CPU</h3>
+                            <p class="text-4xl font-bold" id="cpu-usage">--%</p>
+                        </div>
+                        <i class="fas fa-microchip text-3xl text-blue-400"></i>
+                    </div>
+                    <div class="mt-4">
+                        <div class="w-full bg-gray-700 rounded-full h-2.5">
+                            <div class="bg-blue-500 h-2.5 rounded-full" id="cpu-bar" style="width: 0%"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- RAM Card -->
+                <div class="glass-card rounded-lg p-6 shadow-lg">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <h3 class="text-xl font-semibold mb-2">RAM</h3>
+                            <p class="text-4xl font-bold" id="ram-usage">--%</p>
+                        </div>
+                        <i class="fas fa-memory text-3xl text-green-400"></i>
+                    </div>
+                    <div class="mt-4">
+                        <div class="w-full bg-gray-700 rounded-full h-2.5">
+                            <div class="bg-green-500 h-2.5 rounded-full" id="ram-bar" style="width: 0%"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Storage Card -->
+                <div class="glass-card rounded-lg p-6 shadow-lg">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <h3 class="text-xl font-semibold mb-2">Storage</h3>
+                            <p class="text-4xl font-bold" id="storage-usage">--%</p>
+                        </div>
+                        <i class="fas fa-hdd text-3xl text-yellow-400"></i>
+                    </div>
+                    <div class="mt-4">
+                        <div class="w-full bg-gray-700 rounded-full h-2.5">
+                            <div class="bg-yellow-500 h-2.5 rounded-full" id="storage-bar" style="width: 0%"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Temperature Card -->
+                <div class="glass-card rounded-lg p-6 shadow-lg">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <h3 class="text-xl font-semibold mb-2">Temperature</h3>
+                            <p class="text-4xl font-bold" id="temp-usage">--°C</p>
+                        </div>
+                        <i class="fas fa-temperature-high text-3xl text-red-400"></i>
+                    </div>
+                    <div class="mt-4">
+                        <div class="w-full bg-gray-700 rounded-full h-2.5">
+                            <div class="bg-red-500 h-2.5 rounded-full" id="temp-bar" style="width: 0%"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="text-center">
+            <a href="system-dashboard.html" class="inline-block bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg transition duration-300">
+                <i class="fas fa-search mr-2"></i> Run Full System Analysis
+            </a>
+        </section>
+    </main>
+
+    <!-- Background Video -->
+    <video id="bgVideo" autoplay muted loop class="fixed top-0 left-0 w-full h-full object-cover -z-10 opacity-80">
+        <source src="1743855746_1743855716_eed079d1-cf3c-4eba-b4d6-921278c5424f_no_sub_h264_watermarked.mp4" type="video/mp4">
+        Your browser does not support the video tag.
+    </video>
+
+    <!-- Music Player -->
+    <audio id="bgMusic" loop>
+        <source src="Chill Music — Deep Focus & Inspiring Mix-yt.savetube.me.mp3" type="audio/mpeg">
+        Your browser does not support the audio element.
+    </audio>
+
+    <!-- Audio Frame (hidden) -->
+    <iframe src="audio.html" class="hidden" id="audioFrame" title="Background Music"></iframe>
+
+    <!-- Enhanced Music Player -->
+    <div class="fixed bottom-4 left-4 z-50 bg-black bg-opacity-70 p-3 rounded-xl backdrop-blur-lg shadow-lg">
+        <div class="flex items-center space-x-4">
+            <!-- Album Art Placeholder -->
+            <div class="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
+                <i class="fas fa-music text-white text-xl"></i>
+            </div>
+            
+            <!-- Track Info -->
+
+    <script src="script.js"></script>
+
+    <div class="relative z-10"> <!-- Content wrapper -->
+    <script>
+        // Persistent music player
+        let bgMusic = document.getElementById('bgMusic');
+        if (!bgMusic) {
+            bgMusic = document.createElement('audio');
+            bgMusic.id = 'bgMusic';
+            bgMusic.loop = true;
+            bgMusic.innerHTML = `
+                <source src="Chill Music — Deep Focus & Inspiring Mix-yt.savetube.me.mp3" type="audio/mpeg">
+                Your browser does not support the audio element.
+            `;
+            document.body.appendChild(bgMusic);
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const bgVideo = document.getElementById('bgVideo');
+            const playBtn = document.getElementById('playBtn');
+            const volumeControl = document.getElementById('volumeControl');
+            const volumeIcon = document.getElementById('volumeIcon');
+
+            // Restore state from localStorage
+            const savedVolume = localStorage.getItem('musicVolume');
+            const savedState = localStorage.getItem('musicPlaying');
+            
+            if (savedVolume) {
+                bgMusic.volume = parseFloat(savedVolume);
+                volumeControl.value = savedVolume;
+                updateVolumeIcon();
+            } else {
+                bgMusic.volume = 0.5;
+            }
+
+            if (savedState === 'true') {
+                bgMusic.play().catch(e => console.log('Autoplay prevented:', e));
+                playBtn.innerHTML = '<i class="fas fa-pause"></i>';
+            }
+
+            // Play/pause toggle
+            playBtn.addEventListener('click', () => {
+                if (bgMusic.paused) {
+                    bgMusic.play();
+                    playBtn.innerHTML = '<i class="fas fa-pause"></i>';
+                    localStorage.setItem('musicPlaying', 'true');
+                } else {
+                    bgMusic.pause();
+                    playBtn.innerHTML = '<i class="fas fa-play"></i>';
+                    localStorage.setItem('musicPlaying', 'false');
+                }
+            });
+
+            // Volume control
+            volumeControl.addEventListener('input', () => {
+                bgMusic.volume = volumeControl.value;
+                localStorage.setItem('musicVolume', volumeControl.value);
+                updateVolumeIcon();
+            });
+
+            function updateVolumeIcon() {
+                if (volumeControl.value == 0) {
+                    volumeIcon.innerHTML = '<i class="fas fa-volume-mute"></i>';
+                } else if (volumeControl.value < 0.5) {
+                    volumeIcon.innerHTML = '<i class="fas fa-volume-down"></i>';
+                } else {
+                    volumeIcon.innerHTML = '<i class="fas fa-volume-up"></i>';
+                }
+            }
+
+            // Start experience overlay (only show if first visit)
+            if (!localStorage.getItem('experienceStarted')) {
+                const playOverlay = document.createElement('div');
+                playOverlay.innerHTML = `
+                    <div class="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50">
+                        <button onclick="startExperience()" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg text-xl flex items-center">
+                            <i class="fas fa-play mr-2"></i> Start Optimization Experience
+                        </button>
+                    </div>
+                `;
+                document.body.appendChild(playOverlay);
+
+                window.startExperience = () => {
+                    bgVideo.play().catch(e => console.log('Autoplay prevented:', e));
+                    bgMusic.play().catch(e => console.log('Autoplay prevented:', e));
+                    playBtn.innerHTML = '<i class="fas fa-pause"></i>';
+                    playOverlay.remove();
+                    localStorage.setItem('experienceStarted', 'true');
+                    localStorage.setItem('musicPlaying', 'true');
+                };
+            }
+        });
+    </script>
+</body>
+</html>
